@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: postgres-db
+  name: postgres-db
+  namespace: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-db
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: postgres-db
+    spec:
+      containers:
+      - image: tushar15july/full_application:postgres-14-alpine
+        name: full-application-5sfwb
+        envFrom:
+         - configMapRef:
+             name: postgres-config
+        volumeMounts:
+         - name: db-storage
+           mountPath: /var/lib/postgresql/data
+      volumes:
+       - name: db-storage
+         emptyDir: {}
+

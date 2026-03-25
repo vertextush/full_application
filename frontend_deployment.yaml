@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: frontend
+  name: frontend
+  namespace: front
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - image: tushar15july/full_application:frontend
+        name: full-application-frontend
+        envFrom:
+         - configMapRef:
+             name: frontend-config
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080

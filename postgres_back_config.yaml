@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  POSTGRES_DB: my_db
+  POSTGRES_HOST: "10.98.198.140"
+  POSTGRES_PASSWORD: tushar
+  POSTGRES_PORT: "5432"
+  POSTGRES_USER: tushar
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: postgres-config
+  namespace: back

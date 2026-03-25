@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: front
+data:
+  BACKEND_BASE_URL: "http://192.168.29.55:30002"
