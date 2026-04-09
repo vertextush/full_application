@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: front
+  labels:
+    app: frontend
+data:
+  # Full backend URL - takes highest priority
+  # Use Kubernetes service name: http://<service-name>:<port>
+  # Change this to match your backend service name and port
+  BACKEND_BASE_URL: "http://backend:3000"
+
+  # Alternatively, use individual components (only used if BACKEND_BASE_URL is empty):
+  # BACKEND_HOST: "backend"
+  # BACKEND_PORT: "3000"
+  # BACKEND_PROTOCOL: "http"

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: back
+  labels:
+    app: backend
+data:
+  # DATABASE_URL is set in backend-secret.yaml (contains credentials)
+  # Auto-detects database type from the URL prefix:
+  #   postgresql:// or postgres://  → PostgreSQL
+  #   mysql://                       → MySQL
+  #   mssql://                       → SQL Server / Azure SQL
+  #   mongodb:// or mongodb+srv://   → MongoDB / Cosmos DB
+
+  # Optional: override auto-detected database type
+  # DB_TYPE: "postgres"     # Options: postgres, mysql, mssql, azure-sql, mongodb, cosmosdb
+
+  # Application settings
+  PORT: "3000"
+  NODE_ENV: "production"
