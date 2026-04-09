@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: full_application_backend:latest
+          image: tushar15july/full_application:backend
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
