@@ -24,8 +24,10 @@ spec:
           envFrom:
             - configMapRef:
                 name: backend-config
+            # DHAYAN DEIN: Agar backend-secret delete ho chuka hai, toh niche 
+            # wala section remove karna hoga ya db-connection-secret use karna hoga
             - secretRef:
-                name: backend-secret
+                name: db-connection-secret 
           resources:
             requests:
               cpu: "100m"
@@ -37,11 +39,24 @@ spec:
             httpGet:
               path: /health
               port: 3000
-            initialDelaySeconds: 500
+            initialDelaySeconds: 10 # 500 bahut zyada hai, POC ke liye kam rakhein
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /health
               port: 3000
-            initialDelaySeconds: 600
+            initialDelaySeconds: 20 # 600 bahut zyada hai
             periodSeconds: 30
+          # CSI Volume Mount add kiya gaya hai
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+      # CSI Volumes add kiya gaya hai
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "azure-kv-db-url"
