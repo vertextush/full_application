@@ -1,0 +1,23 @@
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: azure-kv-db-url
+spec:
+  provider: azure
+  secretObjects:                              # Yeh section K8s secret banayega
+    - secretName: db-connection-secret        # Is naam ka K8s secret banega
+      type: Opaque
+      data:
+        - objectName: DATABASE-URL             # Key Vault wala naam
+          key: DATABASE_URL                   # K8s secret ke andar wali key
+  parameters:
+    usePodIdentity: "false"
+    useVMManagedIdentity: "true"
+    userAssignedIdentityID: "fa5c0fba-1d05-43b4-9ce8-b3baca3a6a0d" 
+    keyvaultName: "poc-kv15-july"
+    objects: |
+      array:
+        - |
+          objectName: DATABASE-URL
+          objectType: secret
+    tenantId: "30fe8ff1-adc6-444d-ba94-1238894df42c"
