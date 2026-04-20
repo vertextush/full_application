@@ -12,6 +12,7 @@
       <nav class="navbar">
         <div class="navbar-brand">
           <h1>Multi-Cloud App</h1>
+          <div id="releaseBanner" class="release-banner">Frontend Release: loading...</div>
         </div>
         <ul class="navbar-menu">
           <li><a href="/" class="nav-link active" data-route="home">Home</a></li>
@@ -42,6 +43,25 @@
               <div class="stat-card">
                 <div class="stat-label">Uptime</div>
                 <div id="uptime" class="stat-value">--</div>
+              </div>
+            </div>
+            <h2>Live Release Routing</h2>
+            <div class="release-grid">
+              <div class="release-item">
+                <div class="release-label">Frontend</div>
+                <div id="frontendRelease" class="release-value">loading...</div>
+              </div>
+              <div class="release-item">
+                <div class="release-label">User Service</div>
+                <div id="userServiceRelease" class="release-value">loading...</div>
+              </div>
+              <div class="release-item">
+                <div class="release-label">Dashboard Service</div>
+                <div id="dashboardServiceRelease" class="release-value">loading...</div>
+              </div>
+              <div class="release-item">
+                <div class="release-label">Settings Service</div>
+                <div id="settingsServiceRelease" class="release-value">loading...</div>
               </div>
             </div>
             <div id="dashboardMessage" class="message"></div>

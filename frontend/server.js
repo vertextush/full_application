@@ -3,6 +3,7 @@ const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+const FRONTEND_RELEASE_TAG = process.env.FRONTEND_RELEASE_TAG || "v2";
 
 app.use(express.json());
 
@@ -86,6 +87,7 @@ app.get("/config.js", (req, res) => {
       MICROSERVICES: MICROSERVICES,
       API_PROXY_ENABLED: true,
       DEPLOYMENT_ENV: process.env.DEPLOYMENT_ENV || 'auto',
+      FRONTEND_RELEASE_TAG: FRONTEND_RELEASE_TAG,
     })});`
   );
 });

@@ -1,0 +1,20 @@
+services:
+  user-service:
+    image: tushar15july/micro-services:user-service-v2
+    environment:
+      RELEASE_TAG: v2
+
+  dashboard-service:
+    image: tushar15july/micro-services:dashboard-service-v3
+    environment:
+      RELEASE_TAG: v3
+
+  settings-service:
+    image: tushar15july/micro-services:settings-service-v3
+    environment:
+      RELEASE_TAG: v3
+
+  frontend:
+    image: tushar15july/micro-services:v3
+    environment:
+      FRONTEND_RELEASE_TAG: v3

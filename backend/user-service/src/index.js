@@ -3,8 +3,17 @@ const db = require("./database");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const SERVICE_NAME = "user-service";
+const RELEASE_TAG = process.env.RELEASE_TAG || "v2";
+const CAPABILITY = "users-meta-response";
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+  res.setHeader("X-Service-Name", SERVICE_NAME);
+  res.setHeader("X-Release-Tag", RELEASE_TAG);
+  next();
+});
 
 // CORS Middleware
 app.use((req, res, next) => {
@@ -25,7 +34,9 @@ app.get("/health", async (req, res) => {
 
   res.status(200).json({
     status: "ok",
-    service: "user-service",
+    service: SERVICE_NAME,
+    releaseTag: RELEASE_TAG,
+    capability: CAPABILITY,
     database: dbStatus.connected ? "connected" : "disconnected",
     databaseType: dbStatus.type,
     time: new Date().toISOString(),
@@ -36,7 +47,19 @@ app.get("/health", async (req, res) => {
 app.get("/api/message", (req, res) => {
   res.status(200).json({
     message: "Hello from User Service",
+    service: SERVICE_NAME,
+    releaseTag: RELEASE_TAG,
+    capability: CAPABILITY,
     connected: true,
+  });
+});
+
+app.get("/api/release", (req, res) => {
+  res.status(200).json({
+    service: SERVICE_NAME,
+    releaseTag: RELEASE_TAG,
+    capability: CAPABILITY,
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -111,16 +134,42 @@ app.post("/api/users", async (req, res) => {
 
 // List all users
 app.get("/api/users", async (req, res) => {
+  const includeMeta = req.query.includeMeta === "true";
+
   try {
     if (["mongodb", "cosmosdb"].includes(db.dbType.toLowerCase())) {
-      const result = await db.documentQuery("find", "users", {});
-      return res.status(200).json(result);
+      const users = await db.documentQuery("find", "users", {});
+      if (includeMeta) {
+        return res.status(200).json({
+          users,
+          meta: {
+            service: SERVICE_NAME,
+            releaseTag: RELEASE_TAG,
+            capability: CAPABILITY,
+            total: users.length,
+          },
+        });
+      }
+      return res.status(200).json(users);
     } else {
       const result = await db.query(
         "SELECT id, name, email, created_at FROM users ORDER BY id"
       );
+      const users = result.rows;
 
-      return res.status(200).json(result.rows);
+      if (includeMeta) {
+        return res.status(200).json({
+          users,
+          meta: {
+            service: SERVICE_NAME,
+            releaseTag: RELEASE_TAG,
+            capability: CAPABILITY,
+            total: users.length,
+          },
+        });
+      }
+
+      return res.status(200).json(users);
     }
   } catch (error) {
     console.error("List users error:", error);

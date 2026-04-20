@@ -34,8 +34,71 @@ const getServiceBaseUrl = (endpoint) => {
 
 let editingUserId = null;
 
+const setReleaseValue = (elementId, value) => {
+  const target = document.getElementById(elementId);
+  if (target) {
+    target.textContent = value;
+  }
+};
+
+const getFrontendReleaseTag = () => {
+  return window.APP_CONFIG?.FRONTEND_RELEASE_TAG || "v2";
+};
+
+const loadReleaseRouting = async () => {
+  setReleaseValue("frontendRelease", getFrontendReleaseTag());
+
+  try {
+    const usersBaseUrl = getServiceBaseUrl("/api/users");
+    const usersResponse = await fetch(`${usersBaseUrl}/api/users?includeMeta=true`);
+    const usersPayload = await usersResponse.json();
+    setReleaseValue(
+      "userServiceRelease",
+      usersPayload?.meta?.releaseTag || usersResponse.headers.get("x-release-tag") || "unknown"
+    );
+  } catch (error) {
+    setReleaseValue("userServiceRelease", "unavailable");
+  }
+
+  try {
+    const dashboardBaseUrl = getServiceBaseUrl("/api/dashboard");
+    const dashboardResponse = await fetch(`${dashboardBaseUrl}/api/dashboard`);
+    const dashboardPayload = await dashboardResponse.json();
+    const dashboardTag =
+      dashboardPayload?.releaseTag ||
+      dashboardResponse.headers.get("x-release-tag") ||
+      "unknown";
+    const trafficSignature = dashboardPayload?.trafficSignature || "n/a";
+    setReleaseValue("dashboardServiceRelease", `${dashboardTag} (${trafficSignature})`);
+  } catch (error) {
+    setReleaseValue("dashboardServiceRelease", "unavailable");
+  }
+
+  try {
+    const settingsBaseUrl = getServiceBaseUrl("/api/settings");
+    const settingsResponse = await fetch(`${settingsBaseUrl}/api/settings`);
+    const settingsPayload = await settingsResponse.json();
+    setReleaseValue(
+      "settingsServiceRelease",
+      settingsPayload?.releaseTag || settingsResponse.headers.get("x-release-tag") || "unknown"
+    );
+  } catch (error) {
+    setReleaseValue("settingsServiceRelease", "unavailable");
+  }
+};
+
+const setFrontendReleaseBanner = () => {
+  const banner = document.getElementById("releaseBanner");
+  if (banner) {
+    banner.textContent = `Frontend Release: ${getFrontendReleaseTag()}`;
+  }
+};
+
 // ==================== DASHBOARD PAGE ====================
 const loadDashboard = async () => {
+  setFrontendReleaseBanner();
+  loadReleaseRouting();
+
   try {
     const baseUrl = getServiceBaseUrl("/api/dashboard");
     const response = await fetch(`${baseUrl}/api/dashboard`);
@@ -60,6 +123,9 @@ const formatUptime = (seconds) => {
 
 // ==================== USERS PAGE ====================
 const loadUsers = async () => {
+  setFrontendReleaseBanner();
+  loadReleaseRouting();
+
   try {
     const baseUrl = getServiceBaseUrl("/api/users");
     const response = await fetch(`${baseUrl}/api/users`);
@@ -114,6 +180,9 @@ const loadUsers = async () => {
 
 // ==================== SETTINGS PAGE ====================
 const loadSettings = async () => {
+  setFrontendReleaseBanner();
+  loadReleaseRouting();
+
   try {
     const baseUrl = getServiceBaseUrl("/api/settings");
     const response = await fetch(`${baseUrl}/api/settings`);
@@ -251,6 +320,9 @@ if (document.readyState === 'loading') {
       cancelBtn.addEventListener("click", resetForm);
     }
 
+    setFrontendReleaseBanner();
+    loadReleaseRouting();
+
     // Load initial page based on current route
     const route = window.location.pathname;
     if (route === '/' || route === '/home') {
@@ -271,6 +343,9 @@ if (document.readyState === 'loading') {
   if (cancelBtn) {
     cancelBtn.addEventListener("click", resetForm);
   }
+
+  setFrontendReleaseBanner();
+  loadReleaseRouting();
 }
 
 // Export functions globally for router

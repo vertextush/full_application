@@ -3,8 +3,17 @@ const db = require("./database");
 
 const app = express();
 const PORT = process.env.PORT || 3002;
+const SERVICE_NAME = "dashboard-service";
+const RELEASE_TAG = process.env.RELEASE_TAG || "v2";
+const CAPABILITY = "traffic-signature";
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+  res.setHeader("X-Service-Name", SERVICE_NAME);
+  res.setHeader("X-Release-Tag", RELEASE_TAG);
+  next();
+});
 
 // CORS Middleware
 app.use((req, res, next) => {
@@ -25,7 +34,9 @@ app.get("/health", async (req, res) => {
 
   res.status(200).json({
     status: "ok",
-    service: "dashboard-service",
+    service: SERVICE_NAME,
+    releaseTag: RELEASE_TAG,
+    capability: CAPABILITY,
     database: dbStatus.connected ? "connected" : "disconnected",
     databaseType: dbStatus.type,
     time: new Date().toISOString(),
@@ -36,7 +47,19 @@ app.get("/health", async (req, res) => {
 app.get("/api/message", (req, res) => {
   res.status(200).json({
     message: "Hello from Dashboard Service",
+    service: SERVICE_NAME,
+    releaseTag: RELEASE_TAG,
+    capability: CAPABILITY,
     connected: true,
+  });
+});
+
+app.get("/api/release", (req, res) => {
+  res.status(200).json({
+    service: SERVICE_NAME,
+    releaseTag: RELEASE_TAG,
+    capability: CAPABILITY,
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -66,13 +89,16 @@ app.get("/api/dashboard", async (req, res) => {
 
     res.status(200).json({
       status: "ok",
+      service: SERVICE_NAME,
+      releaseTag: RELEASE_TAG,
+      trafficSignature: process.env.HOSTNAME || "local",
       databaseType: db.dbType,
       statistics: {
         totalUsers: userCount,
         uptime: process.uptime(),
         timestamp: new Date().toISOString(),
       },
-      features: ["User Management", "Multi-Cloud Database", "Settings"],
+      features: ["User Management", "Multi-Cloud Database", "Settings", "Traffic Signature"],
     });
   } catch (error) {
     console.error("Dashboard error:", error);

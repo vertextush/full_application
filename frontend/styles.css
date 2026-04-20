@@ -36,6 +36,18 @@ body {
   color: white;
 }
 
+.release-banner {
+  display: inline-block;
+  margin: 0 0 12px 0;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #042f2e;
+  background: #99f6e4;
+  border-radius: 999px;
+}
+
 .navbar-menu {
   list-style: none;
   margin: 0;
@@ -141,6 +153,35 @@ p {
   color: #0f766e;
   font-size: 2rem;
   font-weight: 600;
+}
+
+.release-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 16px 0 8px;
+}
+
+.release-item {
+  background: #ecfeff;
+  border: 1px solid #a5f3fc;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.release-label {
+  color: #155e75;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.release-value {
+  color: #0f766e;
+  font-size: 1rem;
+  font-weight: 700;
+  word-break: break-word;
 }
 
 /* ==================== SETTINGS ==================== */

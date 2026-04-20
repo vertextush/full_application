@@ -18,10 +18,13 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: tushar15july/micro-services:v1
+          image: tushar15july/micro-services:v2
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
+          env:
+            - name: FRONTEND_RELEASE_TAG
+              value: v3
           envFrom:
             - configMapRef:
                 name: frontend-config

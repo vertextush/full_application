@@ -3,8 +3,17 @@ const db = require("./database");
 
 const app = express();
 const PORT = process.env.PORT || 3003;
+const SERVICE_NAME = "settings-service";
+const RELEASE_TAG = process.env.RELEASE_TAG || "v2";
+const CAPABILITY = "release-flags";
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+  res.setHeader("X-Service-Name", SERVICE_NAME);
+  res.setHeader("X-Release-Tag", RELEASE_TAG);
+  next();
+});
 
 // CORS Middleware
 app.use((req, res, next) => {
@@ -25,7 +34,9 @@ app.get("/health", async (req, res) => {
 
   res.status(200).json({
     status: "ok",
-    service: "settings-service",
+    service: SERVICE_NAME,
+    releaseTag: RELEASE_TAG,
+    capability: CAPABILITY,
     database: dbStatus.connected ? "connected" : "disconnected",
     databaseType: dbStatus.type,
     time: new Date().toISOString(),
@@ -36,7 +47,19 @@ app.get("/health", async (req, res) => {
 app.get("/api/message", (req, res) => {
   res.status(200).json({
     message: "Hello from Settings Service",
+    service: SERVICE_NAME,
+    releaseTag: RELEASE_TAG,
+    capability: CAPABILITY,
     connected: true,
+  });
+});
+
+app.get("/api/release", (req, res) => {
+  res.status(200).json({
+    service: SERVICE_NAME,
+    releaseTag: RELEASE_TAG,
+    capability: CAPABILITY,
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -53,11 +76,14 @@ app.get("/api/settings", (req, res) => {
   res.status(200).json({
     appName: "Multi-Cloud User Management",
     version: "2.0.0",
+    releaseTag: RELEASE_TAG,
+    service: SERVICE_NAME,
     database: db.dbType,
     features: {
       userManagement: true,
       multiCloud: true,
       pathBasedRouting: true,
+      releaseFlags: true,
     },
     supportedDatabases: [
       "PostgreSQL",
