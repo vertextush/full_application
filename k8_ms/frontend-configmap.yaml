@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: front
+  labels:
+    app: frontend
+    app.kubernetes.io/part-of: full-application
+data:
+  DEPLOYMENT_ENV: "kubernetes"
+  NODE_ENV: "production"
+
+  # Frontend pod runs in namespace "front" while backend services run in "back".
+  # Use fully-qualified in-cluster DNS names.
+  USER_SERVICE_URL: "http://user-service.back.svc.cluster.local:3001"
+  DASHBOARD_SERVICE_URL: "http://dashboard-service.back.svc.cluster.local:3002"
+  SETTINGS_SERVICE_URL: "http://settings-service.back.svc.cluster.local:3003"

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: microservices-backend-config
+  namespace: back
+  labels:
+    app.kubernetes.io/name: microservices-backend
+    app.kubernetes.io/part-of: full-application
+data:
+  NODE_ENV: "production"
+
+  # Optional override. If omitted, services auto-detect from DATABASE_URL scheme.
+  # Options: postgres, mysql, mssql, azure-sql, mongodb, cosmosdb
+  # DB_TYPE: "postgres"
+
+  USER_SERVICE_PORT: "3001"
+  DASHBOARD_SERVICE_PORT: "3002"
+  SETTINGS_SERVICE_PORT: "3003"

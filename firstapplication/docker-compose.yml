@@ -1,0 +1,187 @@
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: tushar-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-myapp_db}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # ============================================
+  # MICROSERVICES - User Service
+  # ============================================
+  user-service:
+    build:
+      context: ./backend/user-service
+      dockerfile: Dockerfile
+    image: tushar15july/full_application:user-service
+    container_name: user-service
+    environment:
+      # Database configuration (shared PostgreSQL)
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-${POSTGRES_USER:-postgres}}
+      DB_PASSWORD: ${DB_PASSWORD:-${POSTGRES_PASSWORD:-password}}
+      DB_NAME: ${DB_NAME:-${POSTGRES_DB:-myapp_db}}
+      
+      PORT: ${USER_SERVICE_PORT:-3001}
+      NODE_ENV: ${NODE_ENV:-development}
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3001/api/users"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ============================================
+  # MICROSERVICES - Dashboard Service
+  # ============================================
+  dashboard-service:
+    build:
+      context: ./backend/dashboard-service
+      dockerfile: Dockerfile
+    image: tushar15july/full_application:dashboard-service
+    container_name: dashboard-service
+    environment:
+      # Database configuration (shared PostgreSQL)
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-${POSTGRES_USER:-postgres}}
+      DB_PASSWORD: ${DB_PASSWORD:-${POSTGRES_PASSWORD:-password}}
+      DB_NAME: ${DB_NAME:-${POSTGRES_DB:-myapp_db}}
+      
+      PORT: ${DASHBOARD_SERVICE_PORT:-3002}
+      NODE_ENV: ${NODE_ENV:-development}
+    ports:
+      - "3002:3002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3002/api/dashboard"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ============================================
+  # MICROSERVICES - Settings Service
+  # ============================================
+  settings-service:
+    build:
+      context: ./backend/settings-service
+      dockerfile: Dockerfile
+    image: tushar15july/full_application:settings-service
+    container_name: settings-service
+    environment:
+      # Database configuration (shared PostgreSQL)
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-${POSTGRES_USER:-postgres}}
+      DB_PASSWORD: ${DB_PASSWORD:-${POSTGRES_PASSWORD:-password}}
+      DB_NAME: ${DB_NAME:-${POSTGRES_DB:-myapp_db}}
+      
+      PORT: ${SETTINGS_SERVICE_PORT:-3003}
+      NODE_ENV: ${NODE_ENV:-development}
+    ports:
+      - "3003:3003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3003/api/settings"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ============================================
+  # FRONTEND - Platform Agnostic Service Discovery
+  # ============================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: tushar15july/full_application:frontend
+    container_name: simple-frontend
+    environment:
+      # ==================================================
+      # SERVICE DISCOVERY CONFIGURATION
+      # ==================================================
+      # 
+      # Choose ONE of the following patterns:
+      #
+      # 1. LOCAL DEVELOPMENT (localhost)
+      #    USER_SERVICE_URL=http://localhost:3001
+      #    DASHBOARD_SERVICE_URL=http://localhost:3002
+      #    SETTINGS_SERVICE_URL=http://localhost:3003
+      #
+      # 2. DOCKER COMPOSE (service discovery by name)
+      #    USER_SERVICE_URL=http://user-service:3001
+      #    DASHBOARD_SERVICE_URL=http://dashboard-service:3002
+      #    SETTINGS_SERVICE_URL=http://settings-service:3003
+      #
+      # 3. KUBERNETES (k8s service discovery)
+      #    USER_SERVICE_URL=http://user-service.default.svc.cluster.local:3001
+      #    DASHBOARD_SERVICE_URL=http://dashboard-service.default.svc.cluster.local:3002
+      #    SETTINGS_SERVICE_URL=http://settings-service.default.svc.cluster.local:3003
+      #
+      # 4. CLOUD / INGRESS (custom domain)
+      #    USER_SERVICE_URL=http://api.example.com
+      #    DASHBOARD_SERVICE_URL=http://api.example.com
+      #    SETTINGS_SERVICE_URL=http://api.example.com
+      #
+      # Default (if not specified): Uses service names (works with docker-compose)
+      USER_SERVICE_URL: ${USER_SERVICE_URL:-http://user-service:3001}
+      DASHBOARD_SERVICE_URL: ${DASHBOARD_SERVICE_URL:-http://dashboard-service:3002}
+      SETTINGS_SERVICE_URL: ${SETTINGS_SERVICE_URL:-http://settings-service:3003}
+      
+      DEPLOYMENT_ENV: ${DEPLOYMENT_ENV:-docker}
+      NODE_ENV: ${NODE_ENV:-development}
+    ports:
+      - "8080:8080"
+    depends_on:
+      user-service:
+        condition: service_healthy
+      dashboard-service:
+        condition: service_healthy
+      settings-service:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

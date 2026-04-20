@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-proxy
+  namespace: back # Jahan apka backend aur ingress hai
+spec:
+  type: ExternalName
+  externalName: frontend.front.svc.cluster.local # frontend_service_name.namespace_name

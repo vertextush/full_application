@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi-Cloud User Management</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Navigation -->
+      <nav class="navbar">
+        <div class="navbar-brand">
+          <h1>Multi-Cloud App</h1>
+        </div>
+        <ul class="navbar-menu">
+          <li><a href="/" class="nav-link active" data-route="home">Home</a></li>
+          <li><a href="/users" class="nav-link" data-route="users">Users</a></li>
+          <li><a href="/settings" class="nav-link" data-route="settings">Settings</a></li>
+        </ul>
+      </nav>
+
+      <!-- Main Content Area -->
+      <main class="main-container">
+        <!-- Home Page -->
+        <div id="home-page" class="page active">
+          <div class="card">
+            <h1>Dashboard</h1>
+            <div id="dashboardStats" class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Total Users</div>
+                <div id="userCount" class="stat-value">0</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Database Type</div>
+                <div id="dbType" class="stat-value">Loading...</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Application Status</div>
+                <div id="appStatus" class="stat-value">Connected</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Uptime</div>
+                <div id="uptime" class="stat-value">--</div>
+              </div>
+            </div>
+            <div id="dashboardMessage" class="message"></div>
+          </div>
+        </div>
+
+        <!-- Users Management Page -->
+        <div id="users-page" class="page">
+          <div class="card">
+            <h1>User Management</h1>
+            <p>Create, read, update, and delete users</p>
+
+            <div class="form-section">
+              <h2 id="formTitle">Add New User</h2>
+              <form id="userForm">
+                <div class="form-group">
+                  <label for="nameInput">Name:</label>
+                  <input type="text" id="nameInput" name="name" required />
+                </div>
+                <div class="form-group">
+                  <label for="emailInput">Email:</label>
+                  <input type="email" id="emailInput" name="email" required />
+                </div>
+                <button type="submit" id="submitBtn">Create User</button>
+                <button type="button" id="cancelBtn" style="display: none">Cancel</button>
+              </form>
+              <div id="formMessage" class="message"></div>
+            </div>
+
+            <div class="users-section">
+              <h2>Users List</h2>
+              <div id="usersList" class="users-container"></div>
+              <div id="noUsers" class="no-users">No users yet. Create one above!</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div id="settings-page" class="page">
+          <div class="card">
+            <h1>Settings</h1>
+            <div id="settingsContent" class="settings-content">
+              <div class="setting-item">
+                <div class="setting-label">Application Name</div>
+                <div id="appName" class="setting-value">Loading...</div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-label">Version</div>
+                <div id="appVersion" class="setting-value">Loading...</div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-label">Database Type</div>
+                <div id="settingsDbType" class="setting-value">Loading...</div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-label">Supported Databases</div>
+                <div id="supportedDBs" class="setting-value">Loading...</div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-label">Features</div>
+                <div id="features" class="setting-value">Loading...</div>
+              </div>
+            </div>
+            <div id="settingsMessage" class="message"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+    <script src="router.js"></script>
+  </body>
+</html>
